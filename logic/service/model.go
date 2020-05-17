@@ -17,6 +17,7 @@ type RedisConf struct {
 	RedisMaxIdle     int
 	RedisMaxActive   int
 	RedisIdleTimeout int
+	RedisQueueName   string
 }
 
 type EtcdConf struct {
@@ -27,12 +28,17 @@ type EtcdConf struct {
 }
 
 type ProductInfoConf struct {
-	ProductID int
-	StartTime int64
-	EndTime   int64
-	Status    int
-	Total     int
-	Left      int
+	ProductID         int
+	StartTime         int64
+	EndTime           int64
+	Status            int
+	Total             int
+	Left              int
+	OnePersonBuyLimit int
+	BuyRate           float64
+	SoldMaxLimit      int
+
+	SecLimit *SecLimit
 }
 
 type LogicConf struct {
@@ -52,6 +58,7 @@ type LogicConf struct {
 
 	SendToWriteChanTimeout  int
 	SendToHandleChanTimeout int
+	TokenSecret             string
 }
 
 type LogicContext struct {
@@ -63,6 +70,11 @@ type LogicContext struct {
 	waitgroup            sync.WaitGroup
 	Read2HandleChan      chan *SecKillRequest
 	Handle2WriteChan     chan *SecKillResponse
+
+	UserBuyHistoryMap     map[int]*UserBuyHistory
+	UserBuyHistoryMapLock sync.Mutex
+
+	productCountMgr *ProductCountMgr
 }
 
 type SecKillRequest struct {
@@ -85,5 +97,6 @@ type SecKillResponse struct {
 	ProductID int
 	UserID    int
 	Token     string
+	TokenTime int64
 	Code      int
 }

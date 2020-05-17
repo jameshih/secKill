@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/astaxie/beego/config"
 	"github.com/astaxie/beego/logs"
@@ -32,6 +33,14 @@ func initConfig(confType, filename string) (err error) {
 		appConfig.LogPath = "./logs"
 	}
 
+	appConfig.EtcdConfig.EtcdAddr = conf.String("etcd::etcd_addr")
+	appConfig.EtcdConfig.EtcdSecKeyPrefix = conf.String("etcd::etcd_seckill_key_prefix")
+	productKey := conf.String("etcd::etcd_seckill_product_key")
+	if strings.HasSuffix(appConfig.EtcdConfig.EtcdSecKeyPrefix, "/") == false {
+		appConfig.EtcdConfig.EtcdSecKeyPrefix = appConfig.EtcdConfig.EtcdSecKeyPrefix + "/"
+	}
+	appConfig.EtcdConfig.EtcdSecProductKey = fmt.Sprintf("%s%s", appConfig.EtcdConfig.EtcdSecKeyPrefix, productKey)
+
 	// read Proxy2LayerRedis config
 	appConfig.Proxy2LayerRedis.RedisAddr = conf.String("redis::redis_proxy2layer_addr")
 	if len(appConfig.Proxy2LayerRedis.RedisAddr) == 0 {
@@ -61,6 +70,13 @@ func initConfig(confType, filename string) (err error) {
 		return
 	}
 
+	appConfig.Proxy2LayerRedis.RedisQueueName = conf.String("redis::redis_proxy2layer_queue_name")
+	if len(appConfig.Proxy2LayerRedis.RedisQueueName) == 0 {
+		err = fmt.Errorf("read redis::redis_proxy2layer_queue_name failed")
+		logs.Error(err)
+		return
+	}
+
 	// read Layer2ProxyRedis
 	appConfig.Layer2ProxyRedis.RedisAddr = conf.String("redis::redis_layer2proxy_addr")
 	if len(appConfig.Layer2ProxyRedis.RedisAddr) == 0 {
@@ -86,6 +102,13 @@ func initConfig(confType, filename string) (err error) {
 	appConfig.Layer2ProxyRedis.RedisIdleTimeout, err = conf.Int("redis::redis_layer2proxy_idle_timeout")
 	if err != nil {
 		err = fmt.Errorf("read redis::redis_layer2proxy_idle_timeout failed, error: %v", err)
+		logs.Error(err)
+		return
+	}
+
+	appConfig.Layer2ProxyRedis.RedisQueueName = conf.String("redis::redis_layer2proxy_queue_name")
+	if len(appConfig.Layer2ProxyRedis.RedisQueueName) == 0 {
+		err = fmt.Errorf("read redis::redis_layer2proxy_queue_name failed")
 		logs.Error(err)
 		return
 	}
@@ -144,6 +167,13 @@ func initConfig(confType, filename string) (err error) {
 	appConfig.SendToWriteChanTimeout, err = conf.Int("service::send_to_write_chan_timeout")
 	if err != nil {
 		err = fmt.Errorf("read service::send_to_write_chan_timeout failed, error: %v", err)
+		logs.Error(err)
+		return
+	}
+
+	appConfig.TokenSecret = conf.String("service::seckill_token_secret")
+	if len(appConfig.TokenSecret) == 0 {
+		err = fmt.Errorf("read service::seckill_token_secret failed, error: %v", err)
 		logs.Error(err)
 		return
 	}

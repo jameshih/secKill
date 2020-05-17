@@ -1,9 +1,97 @@
-2020/05/14 14:25:39.690 [D]  init logger succ
-2020/05/14 14:28:44.480 [D]  init logger succ
-2020/05/14 14:34:36.078 [D]  init logger succ
-2020/05/14 14:36:55.407 [D]  init logger succ
-2020/05/14 14:41:18.745 [D]  init logger succ
-2020/05/14 14:49:42.481 [D]  init logger succ
-2020/05/14 14:50:53.521 [D]  init logger succ
-2020/05/14 14:53:22.878 [D]  init logger succ
-2020/05/14 17:45:15.120 [D]  init logger succ
+2020/05/16 20:12:38.366 [D]  init logger succ
+2020/05/16 20:12:38.379 [D]  initRedis succ
+2020/05/16 20:12:38.379 [D]  initEtcd succ
+2020/05/16 20:12:38.379 [D]  get from etcd start
+2020/05/16 20:12:48.380 [E]  get [] from etcd failed, err:context deadline exceeded
+2020/05/16 20:12:48.380 [E]  load product from etcd failed, error: context deadline exceeded
+2020/05/16 20:12:48.380 [E]  init secKill logic failed, error: context deadline exceeded
+2020/05/16 20:18:41.957 [D]  init logger succ
+2020/05/16 20:18:41.966 [D]  initRedis succ
+2020/05/16 20:18:41.967 [D]  initEtcd succ
+2020/05/16 20:18:41.967 [D]  get from etcd start
+2020/05/16 20:18:41.976 [D]  get from etcd succm resp:&{cluster_id:14841639068965178418 member_id:10276657743932975437 revision:3 raft_term:3  [] false 0}
+2020/05/16 20:18:41.976 [D]  update product info succ, data:[]
+2020/05/16 20:18:41.976 [D]  initSecProductWatcher succ
+2020/05/16 20:18:41.976 [D]  init secConf succ
+2020/05/16 20:18:41.977 [D]  begin watch key:product
+2020/05/16 20:18:41.978 [D]  init logicContext succ
+2020/05/16 20:18:41.978 [D]  init logic succ
+2020/05/16 20:18:41.978 [D]  all process goroutine started
+2020/05/16 20:18:41.978 [D]  handle user running
+2020/05/16 20:18:41.978 [D]  handle write running
+2020/05/16 20:18:41.978 [D]  handle write running
+2020/05/16 20:18:41.978 [D]  handle write running
+2020/05/16 20:18:41.978 [D]  handle user running
+2020/05/16 20:18:41.978 [D]  handle user running
+2020/05/16 20:18:41.978 [D]  handle user running
+2020/05/16 20:18:41.978 [D]  handle user running
+2020/05/16 20:18:41.978 [D]  handle user running
+2020/05/16 20:18:41.978 [D]  handle write running
+2020/05/16 20:18:41.978 [D]  handle user running
+2020/05/16 20:18:41.978 [D]  handle user running
+2020/05/16 20:18:41.979 [D]  handle user running
+2020/05/16 20:18:41.979 [D]  handle user running
+2020/05/16 20:18:41.979 [D]  handle user running
+2020/05/16 20:18:41.978 [D]  handle user running
+2020/05/16 20:18:41.979 [D]  handle write running
+2020/05/16 20:18:41.979 [D]  handle user running
+2020/05/16 20:18:41.979 [D]  handle write running
+2020/05/16 20:18:41.979 [D]  handle user running
+2020/05/16 20:18:41.979 [D]  handle write running
+2020/05/16 20:18:41.978 [D]  handle write running
+2020/05/16 20:18:41.979 [D]  handle write running
+2020/05/16 20:18:41.978 [D]  handle user running
+2020/05/16 20:18:41.978 [D]  handle write running
+2020/05/16 20:18:41.978 [D]  handle write running
+2020/05/16 20:18:41.978 [D]  handle write running
+2020/05/16 20:18:41.979 [D]  handle write running
+2020/05/16 20:18:41.979 [D]  handle user running
+2020/05/16 20:18:41.978 [D]  handle write running
+2020/05/16 20:18:41.978 [D]  handle write running
+2020/05/16 20:18:41.978 [D]  handle write running
+2020/05/16 20:21:31.913 [D]  init logger succ
+2020/05/16 20:21:31.922 [D]  initRedis succ
+2020/05/16 20:21:31.923 [D]  initEtcd succ
+2020/05/16 20:21:31.923 [D]  get from etcd start
+2020/05/16 20:21:31.934 [D]  get from etcd succm resp:&{cluster_id:14841639068965178418 member_id:10276657743932975437 revision:3 raft_term:3  [key:"/seckill/product" create_revision:2 mod_revision:3 version:2 value:"[{\"ProductID\":100,\"StartTime\":1589231756,\"EndTime\":1589404556,\"Status\":0,\"Total\":1000,\"Left\":1000},{\"ProductID\":102,\"StartTime\":1589231756,\"EndTime\":1589404556,\"Status\":0,\"Total\":2000,\"Left\":2000}]" ] false 1}
+2020/05/16 20:21:31.934 [D]  key[0] valud[key:"/seckill/product" create_revision:2 mod_revision:3 version:2 value:"[{\"ProductID\":100,\"StartTime\":1589231756,\"EndTime\":1589404556,\"Status\":0,\"Total\":1000,\"Left\":1000},{\"ProductID\":102,\"StartTime\":1589231756,\"EndTime\":1589404556,\"Status\":0,\"Total\":2000,\"Left\":2000}]" ]
+2020/05/16 20:21:31.935 [D]  sec info conf is [[{100 1589231756 1589404556 0 1000 1000 0 0 0 <nil>} {102 1589231756 1589404556 0 2000 2000 0 0 0 <nil>}]]
+2020/05/16 20:21:31.935 [D]  update product info succ, data:[{100 1589231756 1589404556 0 1000 1000 0 0 0 <nil>} {102 1589231756 1589404556 0 2000 2000 0 0 0 <nil>}]
+2020/05/16 20:21:31.935 [D]  initSecProductWatcher succ
+2020/05/16 20:21:31.935 [D]  init secConf succ
+2020/05/16 20:21:31.935 [D]  begin watch key:/seckill/product
+2020/05/16 20:21:31.936 [D]  init logicContext succ
+2020/05/16 20:21:31.936 [D]  init logic succ
+2020/05/16 20:21:31.936 [D]  all process goroutine started
+2020/05/16 20:21:31.936 [D]  handle user running
+2020/05/16 20:21:31.936 [D]  handle write running
+2020/05/16 20:21:31.936 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle write running
+2020/05/16 20:21:31.937 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle user running
+2020/05/16 20:21:31.937 [D]  handle user running

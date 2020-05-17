@@ -1,7 +1,10 @@
 package service
 
 import (
+	"crypto/md5"
 	"encoding/json"
+	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/astaxie/beego/logs"
@@ -67,7 +70,7 @@ func HandleRead() {
 	for {
 		conn := logicContext.Proxy2LayerRedisPool.Get()
 		for {
-			data, err := redis.String(conn.Do("BLPOP", "q", 0))
+			data, err := redis.String(conn.Do("BLPOP", logicContext.logicConf.Proxy2LayerRedis.RedisQueueName, 0))
 			if err != nil {
 				logs.Error("pop from queue failed, error: %v", err)
 				break
@@ -117,7 +120,7 @@ func sendToRedis(res *SecKillResponse) (err error) {
 		return
 	}
 	conn := logicContext.Layer2ProxyRedisPool.Get()
-	_, err = redis.String(conn.Do("RPUSH", "layer2proxy_queue", string(data)))
+	_, err = redis.String(conn.Do("RPUSH", logicContext.logicConf.Layer2ProxyRedis.RedisQueueName, string(data)))
 	if err != nil {
 		logs.Warn("RPUSH to redis failed, error: %v", err)
 		return
@@ -151,6 +154,69 @@ func HandleUser() {
 }
 
 func HandleSecKill(req *SecKillRequest) (res *SecKillResponse, err error) {
+	logicContext.RwSecKillProductLock.RLock()
+	defer logicContext.RwSecKillProductLock.RUnlock()
 
+	res = &SecKillResponse{}
+	product, ok := logicContext.logicConf.ProductInfoMap[req.ProductID]
+	if !ok {
+		logs.Error("cannot find product: %v", req.ProductID)
+		res.Code = ErrNotFoundProduct
+		return
+	}
+	if product.Status == ProductStatusSoldout {
+		res.Code = ErrSoldOut
+		return
+	}
+
+	now := time.Now().Unix()
+	alreadySoldCount := product.SecLimit.Check(now)
+	if alreadySoldCount >= product.SoldMaxLimit {
+		res.Code = ErrRetry
+		return
+	}
+
+	logicContext.UserBuyHistoryMapLock.Lock()
+	defer logicContext.UserBuyHistoryMapLock.Unlock()
+	userHistory, ok := logicContext.UserBuyHistoryMap[req.UserID]
+	if !ok {
+		userHistory = &UserBuyHistory{
+			History: make(map[int]int, 16),
+		}
+		logicContext.UserBuyHistoryMap[req.UserID] = userHistory
+	}
+
+	historyCount := userHistory.GetProductBuyCount(req.ProductID)
+	if historyCount >= product.OnePersonBuyLimit {
+		res.Code = ErrAlreadyBuy
+		return
+	}
+
+	curSold := logicContext.productCountMgr.Count(req.ProductID)
+	if curSold >= product.Total {
+		res.Code = ErrSoldOut
+		product.Status = ProductStatusSoldout
+		return
+	}
+
+	curRate := rand.Float64()
+	if curRate > product.BuyRate {
+		res.Code = ErrRetry
+		return
+	}
+
+	userHistory.Add(req.ProductID, 1)
+	logicContext.productCountMgr.Add(req.ProductID, 1)
+
+	// generate token (userID +productID + currentTime + tokenSecret)
+
+	res.Code = ErrSecKillSucc
+	tokenData := fmt.Sprintf("userID=%d&productID=%d&timestamp=%v&secret=%s",
+		req.UserID,
+		req.ProductID,
+		now,
+		logicContext.logicConf.TokenSecret)
+	res.Token = fmt.Sprintf("%x", md5.Sum([]byte(tokenData)))
+	res.TokenTime = now //time must be the same as in Token or else md5 hash will be different
 	return
 }
