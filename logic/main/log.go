@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 )
 
@@ -31,7 +32,8 @@ func initLogger() (err error) {
 		fmt.Println("initLogger failed, err:", err)
 		return
 	}
-
+	logs.SetLogger("console")
 	logs.SetLogger(logs.AdapterFile, string(configStr))
+	beego.SetLogFuncCall(true)
 	return
 }
