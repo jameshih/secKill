@@ -18,6 +18,20 @@ services:
       - 6379:6379
     volumes:
       - redis:/data
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "toor"
+      MYSQL_USER: "test"
+      MYSQL_PASS: "pass"
+    volumes:
+      - mysql_data:/var/lib/mysql 
+    ports:
+      - 3306:3306
 volumes:
   redis:
+    driver: local
+  mysql_data:
     driver: local

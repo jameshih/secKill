@@ -67,6 +67,7 @@ func RunProcess() (err error) {
 }
 
 func HandleRead() {
+	logs.Debug("handle read running")
 	for {
 		conn := logicContext.Proxy2LayerRedisPool.Get()
 		for {
@@ -211,11 +212,8 @@ func HandleSecKill(req *SecKillRequest) (res *SecKillResponse, err error) {
 	// generate token (userID +productID + currentTime + tokenSecret)
 
 	res.Code = ErrSecKillSucc
-	tokenData := fmt.Sprintf("userID=%d&productID=%d&timestamp=%v&secret=%s",
-		req.UserID,
-		req.ProductID,
-		now,
-		logicContext.logicConf.TokenSecret)
+	tokenData := fmt.Sprintf("userID=%d&productID=%d&timestamp=%d&secret=%s",
+		req.UserID, req.ProductID, now, logicContext.logicConf.TokenSecret)
 	res.Token = fmt.Sprintf("%x", md5.Sum([]byte(tokenData)))
 	res.TokenTime = now //time must be the same as in Token or else md5 hash will be different
 	return

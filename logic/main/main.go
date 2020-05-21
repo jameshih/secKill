@@ -16,7 +16,7 @@ func main() {
 		panic(err)
 	}
 
-	logs.Debug("init config succ")
+	logs.Debug("init config succ, appConfig:%v", appConfig)
 
 	// initialize logger
 	err = initLogger()
