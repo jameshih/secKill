@@ -6,5 +6,7 @@ import (
 )
 
 func init() {
+	beego.Router("/", &product.ProductController{}, "*:ListProduct")
 	beego.Router("/product/list", &product.ProductController{}, "*:ListProduct")
+	beego.Router("/product/new", &product.ProductController{}, "*:NewProduct")
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/astaxie/beego/logs"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jameshih/secKill/admin/model"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -27,10 +28,18 @@ func initDB() (err error) {
 func initAll() (err error) {
 	err = initConfig()
 	if err != nil {
+		logs.Warn("init config failed, error: %v", err)
 		return
 	}
 	err = initDB()
 	if err != nil {
+		logs.Warn("init db failed, error: %v", err)
+		return
+	}
+
+	err = model.Init(Db)
+	if err != nil {
+		logs.Warn("init model failed, error: %v", err)
 		return
 	}
 	return
