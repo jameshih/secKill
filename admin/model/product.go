@@ -29,3 +29,13 @@ func (p *ProductModel) GetProductList() (productList []*Product, err error) {
 	}
 	return
 }
+
+func (p *ProductModel) CreateProduct(product *Product) (err error) {
+	sql := "INSERT INTO product(name, total, status)values(?,?,?)"
+	_, err = Db.Exec(sql, product.ProductName, product.Total, product.Status)
+	if err != nil {
+		logs.Warn("INSERT INTO product failed, error: %v, sql: %v", err, sql)
+		return
+	}
+	return
+}
