@@ -33,15 +33,23 @@ func main() {
 
 	_, err = dotx.Exec(db, "use-app-database")
 	if err != nil {
+		fmt.Print("creating database[app]")
 		_, err = dotx.Exec(db, "create-app-database")
 		if err != nil {
 			panic(err)
 		}
 	}
+	fmt.Println("using database[app]")
 
 	_, err = dotx.Exec(db, "create-product-table")
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
+
+	_, err = dotx.Exec(db, "create-event-table")
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	log.Println("database creation succ")
 }

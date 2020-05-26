@@ -30,6 +30,8 @@ func (p *ProductModel) GetProductList() (productList []*Product, err error) {
 	return
 }
 
+// check duplicate in database
+
 func (p *ProductModel) CreateProduct(product *Product) (err error) {
 	sql := "INSERT INTO product(name, total, status)values(?,?,?)"
 	_, err = Db.Exec(sql, product.ProductName, product.Total, product.Status)
