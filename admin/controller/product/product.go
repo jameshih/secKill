@@ -2,6 +2,7 @@ package product
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
@@ -76,5 +77,5 @@ func (p *ProductController) CreateProduct() {
 	}
 
 	logs.Debug("product name[%s], product qty[%d], product status[%d]", product.ProductName, product.Total, product.Status)
-	p.Redirect("/product/list", 302)
+	p.Redirect("/product/list", http.StatusMovedPermanently)
 }

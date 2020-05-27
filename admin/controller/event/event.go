@@ -2,6 +2,7 @@ package event
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
@@ -94,5 +95,6 @@ func (p *EventController) CreateEvent() {
 
 	logs.Debug("event name[%s], product id[%d], start time[%d], end time[%d], total[%d], status[%d]", event.EventName, event.ProductID, event.StartTime, event.EventID, event.Total, event.Status)
 
-	p.Redirect("/event/list", 302)
+	p.Redirect("/event/list", http.StatusMovedPermanently)
+	return
 }
