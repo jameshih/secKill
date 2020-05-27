@@ -13,7 +13,6 @@ type EventController struct {
 }
 
 func (p *EventController) ListEvent() {
-
 	eventModel := model.NewEventModel()
 	eventList, err := eventModel.GetEventList()
 	if err != nil {
@@ -56,14 +55,14 @@ func (p *EventController) CreateEvent() {
 		return
 	}
 
-	startTime, err := p.GetInt("start_time")
+	startTime, err := p.GetInt64("start_time")
 	if err != nil {
 		err = fmt.Errorf("invalid start time, error: %v", err)
 		logs.Warn(err)
 		return
 	}
 
-	endTime, err := p.GetInt("end_time")
+	endTime, err := p.GetInt64("end_time")
 	if err != nil {
 		err = fmt.Errorf("invalid end time, error: %v", err)
 		logs.Warn(err)
@@ -77,13 +76,6 @@ func (p *EventController) CreateEvent() {
 		return
 	}
 
-	status, err := p.GetInt("status")
-	if err != nil {
-		err = fmt.Errorf("invalid event status, error: %v", err)
-		logs.Warn(err)
-		return
-	}
-
 	eventModel := model.NewEventModel()
 	event := model.Event{
 		EventName: eventName,
@@ -91,8 +83,8 @@ func (p *EventController) CreateEvent() {
 		StartTime: startTime,
 		EndTime:   endTime,
 		Total:     total,
-		Status:    status,
 	}
+
 	err = eventModel.CreateEvent(&event)
 	if err != nil {
 		err = fmt.Errorf("failed to submit, error: %v", err)

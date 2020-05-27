@@ -80,6 +80,7 @@
             <th>Product</th>
             <th>Start Time</th>
             <th>End Time</th>
+            <th>Total</th>
             <th>Status</th>
             <!-- <th>Actions</th> -->
           </tr>
@@ -90,9 +91,10 @@
             <td>{{.EventID}}</td>
             <td>{{.EventName}}</td>
             <td>{{.ProductID}}</td>
-            <td>{{.StartTime}}</td>
-            <td>{{.EndTime}}</td>
-            <td>{{.Status}}</td>
+            <td>{{.StartTimeStr}}</td>
+            <td>{{.EndTimeStr}}</td>
+                        <td>{{.Total}}</td>
+            <td>{{.StatusStr}}</td>
             <!-- <td nowrap></td> -->
           </tr>
           {{end}}
