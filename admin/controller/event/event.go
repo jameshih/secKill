@@ -77,6 +77,20 @@ func (p *EventController) CreateEvent() {
 		return
 	}
 
+	speed, err := p.GetInt("req_limit")
+	if err != nil {
+		err = fmt.Errorf("invalid req limit, error: %v", err)
+		logs.Warn(err)
+		return
+	}
+
+	buyLimit, err := p.GetInt("buy_limit")
+	if err != nil {
+		err = fmt.Errorf("invalid buy limit, error: %v", err)
+		logs.Warn(err)
+		return
+	}
+
 	eventModel := model.NewEventModel()
 	event := model.Event{
 		EventName: eventName,
@@ -84,6 +98,8 @@ func (p *EventController) CreateEvent() {
 		StartTime: startTime,
 		EndTime:   endTime,
 		Total:     total,
+		Speed:     speed,
+		BuyLimit:  buyLimit,
 	}
 
 	err = eventModel.CreateEvent(&event)

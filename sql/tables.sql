@@ -20,6 +20,8 @@ CREATE TABLE event (
   start_time int(11) DEFAULT 0,
   end_time int(11) DEFAULT 0,
   total int(11) DEFAULT 0,
-  status int(11) DEFAULT 0
+  status int(11) DEFAULT 0,
+  req_limit int DEFAULT 100,
+  buy_limit int DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 

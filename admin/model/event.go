@@ -26,6 +26,8 @@ type Event struct {
 	StartTimeStr string
 	EndTimeStr   string
 	StatusStr    string
+	Speed        int `db:"req_limit"`
+	BuyLimit     int `db:"buy_limit"`
 }
 
 type EventModel struct {
@@ -36,7 +38,7 @@ func NewEventModel() *EventModel {
 }
 
 func (p *EventModel) GetEventList() (eventList []*Event, err error) {
-	sql := "SELECT id, name, product_id, start_time, end_time, total, status FROM event order by id"
+	sql := "SELECT id, name, product_id, start_time, end_time, total, status, req_limit, buy_limit FROM event order by id"
 	err = Db.Select(&eventList, sql)
 	if err != nil {
 		logs.Error("SELECT event from mysql failed, error: %v", err)
@@ -118,8 +120,8 @@ func (p *EventModel) CreateEvent(event *Event) (err error) {
 		return
 	}
 
-	sql := "INSERT INTO event(name, product_id, start_time, end_time, total, status)VALUES(?,?,?,?,?,?)"
-	_, err = Db.Exec(sql, event.EventName, event.ProductID, event.StartTime, event.EndTime, event.Total, event.Status)
+	sql := "INSERT INTO event(name, product_id, start_time, end_time, total, status, req_limit, buy_limit)VALUES(?,?,?,?,?,?,?,?)"
+	_, err = Db.Exec(sql, event.EventName, event.ProductID, event.StartTime, event.EndTime, event.Total, event.Status, event.Speed, event.BuyLimit)
 	if err != nil {
 		logs.Warn("INSERT INTO event failed, error: %v, sql: %v", err, sql)
 		return

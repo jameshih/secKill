@@ -81,6 +81,8 @@
             <th>Start Time</th>
             <th>End Time</th>
             <th>Total</th>
+            <th>Request Speed Limit</th>
+            <th>Purchase Limit</th>
             <th>Status</th>
             <!-- <th>Actions</th> -->
           </tr>
@@ -93,7 +95,9 @@
             <td>{{.ProductID}}</td>
             <td>{{.StartTimeStr}}</td>
             <td>{{.EndTimeStr}}</td>
-                        <td>{{.Total}}</td>
+            <td>{{.Total}}</td>
+            <td>{{.Speed}}</td>
+            <td>{{.BuyLimit}}</td>
             <td>{{.StatusStr}}</td>
             <!-- <td nowrap></td> -->
           </tr>

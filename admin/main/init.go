@@ -2,15 +2,18 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/astaxie/beego/logs"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jameshih/secKill/admin/model"
 	"github.com/jmoiron/sqlx"
+	"go.etcd.io/etcd/clientv3"
 )
 
 var (
-	Db *sqlx.DB
+	Db         *sqlx.DB
+	EtcdClient *clientv3.Client
 )
 
 func initDB() (err error) {
@@ -25,6 +28,21 @@ func initDB() (err error) {
 	return
 }
 
+func initEtcd() (err error) {
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{AppConf.etcdConf.Addr},
+		DialTimeout: time.Duration(AppConf.etcdConf.EtcdTimeout) * time.Second,
+	})
+	if err != nil {
+		logs.Error("connect etcd failed, err:", err)
+		return
+	}
+
+	EtcdClient = cli
+	logs.Debug("init Etcd succ")
+	return
+}
+
 func initAll() (err error) {
 	err = initConfig()
 	if err != nil {
@@ -34,6 +52,12 @@ func initAll() (err error) {
 	err = initDB()
 	if err != nil {
 		logs.Warn("init db failed, error: %v", err)
+		return
+	}
+
+	err = initEtcd()
+	if err != nil {
+		logs.Warn("init etcd failed, error: %v", err)
 		return
 	}
 
