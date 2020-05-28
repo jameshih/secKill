@@ -56,7 +56,7 @@ func initAll() (err error) {
 		return
 	}
 
-	err = model.Init(db, etcdClient)
+	err = model.Init(db, etcdClient, AppConf.etcdConf.EtcdSecProductKey)
 	if err != nil {
 		logs.Warn("init model failed, error: %v", err)
 		return

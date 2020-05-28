@@ -1,6 +1,8 @@
 package model
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -28,6 +30,18 @@ type Event struct {
 	StatusStr    string
 	Speed        int `db:"req_limit"`
 	BuyLimit     int `db:"buy_limit"`
+}
+
+type ProductInfoConf struct {
+	ProductID         int
+	StartTime         int64
+	EndTime           int64
+	Status            int
+	Total             int
+	Left              int
+	OnePersonBuyLimit int
+	BuyRate           float64
+	SoldMaxLimit      int
 }
 
 type EventModel struct {
@@ -126,5 +140,70 @@ func (p *EventModel) CreateEvent(event *Event) (err error) {
 		logs.Warn("INSERT INTO event failed, error: %v, sql: %v", err, sql)
 		return
 	}
+	logs.Debug("insert into database succ")
+	err = p.SyncToEtcd(event)
+	if err != nil {
+		logs.Warn("sync to etcd failed, error: %v data:%v", err, event)
+		return
+	}
+	return
+}
+
+func (p *EventModel) SyncToEtcd(event *Event) (err error) {
+	// todo pass in AppConf
+	productInfoList, err := loadProductFromEtcd(EtcdKey)
+
+	var productInfo ProductInfoConf
+	productInfo.StartTime = event.StartTime
+	productInfo.EndTime = event.EndTime
+	productInfo.OnePersonBuyLimit = event.BuyLimit
+	productInfo.ProductID = event.ProductID
+	productInfo.SoldMaxLimit = event.Speed
+	productInfo.StartTime = event.StartTime
+	productInfo.Status = event.Status
+	productInfo.Total = event.Total
+
+	productInfoList = append(productInfoList, productInfo)
+
+	data, err := json.Marshal(productInfoList)
+	if err != nil {
+		logs.Error("json marshal failed, error: %v", err)
+		return
+	}
+
+	_, err = EtcdClient.Put(context.Background(), EtcdKey, string(data))
+	if err != nil {
+		logs.Error("put to etcd failed, error: %v, data[%v]", err, string(data))
+		return
+	}
+	return
+}
+
+func loadProductFromEtcd(key string) (productInfo []ProductInfoConf, err error) {
+	logs.Debug("get from etcd start")
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+	resp, err := EtcdClient.Get(ctx, key)
+	if err != nil {
+		logs.Error("get [%s] from etcd failed, err:%v", key, err)
+		return
+	}
+
+	logs.Debug("get from etcd succ resp:%v", resp)
+	for k, v := range resp.Kvs {
+		logs.Debug("key[%v] valud[%v]", k, v)
+		err = json.Unmarshal(v.Value, &productInfo)
+		if err != nil {
+			logs.Error("Unmarshal sec product info failed, err:%v", err)
+			return
+		}
+
+		logs.Debug("sec info conf is [%v]", productInfo)
+	}
+
+	// updateSecProductInfo(appConf, produtInfo)
+	// logs.Debug("update product info succ, data:%v", produtInfo)
+	// initSecProductWatcher(appConf)
+	// logs.Debug("initSecProductWatcher succ")
 	return
 }

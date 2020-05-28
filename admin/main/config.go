@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
@@ -16,10 +17,11 @@ type MysqlConfig struct {
 }
 
 type EtcdConfig struct {
-	Addr          string
-	EtcdKeyPrefix string
-	ProductKey    string
-	EtcdTimeout   int
+	Addr              string
+	EtcdKeyPrefix     string
+	ProductKey        string
+	EtcdTimeout       int
+	EtcdSecProductKey string
 }
 
 type Config struct {
@@ -102,7 +104,13 @@ func initConfig() (err error) {
 		logs.Error(err)
 		return
 	}
+
 	AppConf.etcdConf.EtcdTimeout = etcdTimeout
+
+	if strings.HasSuffix(AppConf.etcdConf.EtcdKeyPrefix, "/") == false {
+		AppConf.etcdConf.EtcdKeyPrefix = AppConf.etcdConf.EtcdKeyPrefix + "/"
+	}
+	AppConf.etcdConf.EtcdSecProductKey = fmt.Sprintf("%s%s", AppConf.etcdConf.EtcdKeyPrefix, AppConf.etcdConf.ProductKey)
 
 	return
 }
