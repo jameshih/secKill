@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -43,17 +42,19 @@ func (p *SkillController) SecKill() {
 	secRequest.SecTime = secTime
 	secRequest.Nounce = nounce
 	secRequest.UserAuthSig = p.Ctx.GetCookie("userAuthSig")
-	secRequest.UserID, err = strconv.Atoi(p.Ctx.GetCookie("userID"))
-	if err != nil {
-		result["code"] = service.ErrInvalidRequest
-		result["message"] = fmt.Sprintf("invalid cookie")
-		return
-	}
+
+	//Todo build user auth
+	secRequest.UserID, _ = p.GetInt("user_id")
+	// secRequest.UserID, err = strconv.Atoi(p.Ctx.GetCookie("user_id"))
+	// if err != nil {
+	// 	result["code"] = service.ErrInvalidRequest
+	// 	result["message"] = fmt.Sprintf("invalid cookie")
+	// 	return
+	// }
 	secRequest.AccessTime = time.Now()
 	if len(p.Ctx.Request.RemoteAddr) > 0 {
 		secRequest.ClientAddr = strings.Split(p.Ctx.Request.RemoteAddr, ":")[0]
 	}
-
 	secRequest.ClientReferer = p.Ctx.Request.Referer()
 	secRequest.CloseNotify = p.Ctx.ResponseWriter.CloseNotify()
 

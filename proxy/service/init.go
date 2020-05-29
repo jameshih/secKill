@@ -21,6 +21,7 @@ func InitService(serviceConf *SecKillConf) (err error) {
 		logs.Error("load proxy2layer redis pool failed, error: %v", err)
 		return
 	}
+
 	secKillConf.RequestLimitMgr = &RequestLimitMgr{
 		UserLimitMap: make(map[int]*Limit, 1000),
 		IPLimitMap:   make(map[string]*Limit, 10000),
@@ -32,12 +33,8 @@ func InitService(serviceConf *SecKillConf) (err error) {
 		return
 	}
 
-	secKillConf.RequestLimitMgr = &RequestLimitMgr{
-		UserLimitMap: make(map[int]*Limit, 1000),
-		IPLimitMap:   make(map[string]*Limit, 10000),
-	}
-
 	secKillConf.SecKillRequestChan = make(chan *SecKillRequest, secKillConf.SecKillRequestChanSize)
+	secKillConf.UserConnMap = make(map[string]chan *SecKillResult, 10000)
 
 	initRedisProcessFunc(secKillConf)
 	logs.Debug("init service succ, config: %v", secKillConf)
@@ -148,8 +145,9 @@ func loadBlacklist() (err error) {
 		secKillConf.IPBlacklistMap[v] = true
 	}
 
-	go syncIPBlackList()
-	go syncIDBlackList()
+	// Todo fix go routine leak
+	// syncIPBlackList()
+	// syncIDBlackList()
 
 	return
 }
@@ -182,8 +180,8 @@ func syncIPBlackList() {
 }
 
 func syncIDBlackList() {
-	var idList []int
-	lastTime := time.Now().Unix()
+	// var idList []int
+	// lastTime := time.Now().Unix()
 	for {
 		conn := secKillConf.BlacklistRedisPool.Get()
 		defer conn.Close()
@@ -192,17 +190,23 @@ func syncIDBlackList() {
 		if err != nil {
 			continue
 		}
-		curTime := time.Now().Unix()
-		idList = append(idList, id)
+		secKillConf.RWBlacklistLock.Lock()
+		secKillConf.IDBlacklistMap[id] = true
+		secKillConf.RWBlacklistLock.Unlock()
+		logs.Info("sync id list from redis succ, ip[%v]", id)
 
-		if len(idList) > 100 || curTime-lastTime > 5 {
-			secKillConf.RWBlacklistLock.Lock()
-			for _, v := range idList {
-				secKillConf.IDBlacklistMap[v] = true
-			}
-			secKillConf.RWBlacklistLock.Unlock()
-			lastTime = curTime
-			logs.Info("sync id list from redis succ, ip[%v]", idList)
-		}
+		// Todo fix go routine leak
+		// curTime := time.Now().Unix()
+		// idList = append(idList, id)
+
+		// if len(idList) > 100 || curTime-lastTime > 5 {
+		// 	secKillConf.RWBlacklistLock.Lock()
+		// 	for _, v := range idList {
+		// 		secKillConf.IDBlacklistMap[v] = true
+		// 	}
+		// 	secKillConf.RWBlacklistLock.Unlock()
+		// 	lastTime = curTime
+		// 	logs.Info("sync id list from redis succ, ip[%v]", idList)
+		// }
 	}
 }

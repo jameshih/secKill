@@ -71,12 +71,22 @@ func HandleRead() {
 	for {
 		conn := logicContext.Proxy2LayerRedisPool.Get()
 		for {
-			data, err := redis.String(conn.Do("BLPOP", logicContext.logicConf.Proxy2LayerRedis.RedisQueueName, 0))
+			ret, err := conn.Do("BLPOP", logicContext.logicConf.Proxy2LayerRedis.RedisQueueName, 0)
 			if err != nil {
-				logs.Error("pop from queue failed, error: %v", err)
 				break
 			}
-			logs.Debug("pop from queue, data:%s", data)
+			tmp, ok := ret.([]interface{})
+			if !ok || len(tmp) != 2 {
+				logs.Error("pop from queue failed, error: %v", err)
+				continue
+			}
+			data, ok := tmp[1].([]byte)
+			if !ok {
+				logs.Error("pop from queue failed, error: %v", err)
+				continue
+			}
+
+			logs.Debug("pop from queue, data: %s", string(data))
 
 			var req SecKillRequest
 			json.Unmarshal([]byte(data), &req)
@@ -121,7 +131,7 @@ func sendToRedis(res *SecKillResponse) (err error) {
 		return
 	}
 	conn := logicContext.Layer2ProxyRedisPool.Get()
-	_, err = redis.String(conn.Do("RPUSH", logicContext.logicConf.Layer2ProxyRedis.RedisQueueName, string(data)))
+	_, err = conn.Do("RPUSH", logicContext.logicConf.Layer2ProxyRedis.RedisQueueName, string(data))
 	if err != nil {
 		logs.Warn("RPUSH to redis failed, error: %v", err)
 		return
@@ -159,6 +169,8 @@ func HandleSecKill(req *SecKillRequest) (res *SecKillResponse, err error) {
 	defer logicContext.RwSecKillProductLock.RUnlock()
 
 	res = &SecKillResponse{}
+	res.UserID = req.UserID
+	res.ProductID = req.ProductID
 	product, ok := logicContext.logicConf.ProductInfoMap[req.ProductID]
 	if !ok {
 		logs.Error("cannot find product: %v", req.ProductID)
@@ -201,7 +213,10 @@ func HandleSecKill(req *SecKillRequest) (res *SecKillResponse, err error) {
 	}
 
 	curRate := rand.Float64()
-	if curRate > product.BuyRate {
+	logs.Debug("curRate: %v, product: %v", curRate, product.BuyRate)
+	// Todo fix curRate
+	if curRate > 0.8 {
+		// if curRate > product.BuyRate {
 		res.Code = ErrRetry
 		return
 	}

@@ -197,7 +197,6 @@ func loadProductFromEtcd(key string) (productInfo []ProductInfoConf, err error) 
 			logs.Error("Unmarshal sec product info failed, err:%v", err)
 			return
 		}
-
 		logs.Debug("sec info conf is [%v]", productInfo)
 	}
 

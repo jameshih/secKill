@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/astaxie/beego/logs"
 	"github.com/gomodule/redigo/redis"
@@ -18,7 +19,7 @@ func WriteHandle() {
 			conn.Close()
 			continue
 		}
-		_, err = conn.Do("LPUSH", "sec_queue", data)
+		_, err = conn.Do("LPUSH", "sec_queue", string(data))
 		if err != nil {
 			logs.Error("LPUSH failedd, error: %v, req: %v", err, req)
 			conn.Close()
@@ -33,6 +34,13 @@ func ReadHandle() {
 		conn := secKillConf.Proxy2LayerRedisPool.Get()
 		reply, err := conn.Do("RPOP", "recv_queue")
 		data, err := redis.String(reply, err)
+		// if no item in redis continue
+		if err == redis.ErrNil {
+			time.Sleep(time.Second)
+			conn.Close()
+			continue
+		}
+		logs.Debug("RPOP from redis succ, data:%s", string(data))
 		if err != nil {
 			logs.Error("RPOP failed, error: %v", err)
 			conn.Close()

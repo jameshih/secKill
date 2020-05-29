@@ -90,9 +90,9 @@ type SecKillRequest struct {
 	AccessTime    time.Time
 	ClientAddr    string
 	ClientReferer string
-	CloseNotify   <-chan bool
+	CloseNotify   <-chan bool `json:"-"`
 
-	ResultChan chan *SecKillResult
+	ResultChan chan *SecKillResult `json:"-"`
 }
 
 type Limit struct {

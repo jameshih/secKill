@@ -48,12 +48,13 @@ func SecKill(secRequest *SecKillRequest) (data map[string]interface{}, code int,
 	secKillConf.RwSecKillProductLock.RLock()
 	defer secKillConf.RwSecKillProductLock.RUnlock()
 
-	err = userValidate(secRequest)
-	if err != nil {
-		code = ErrUserValidationFailed
-		logs.Warn("userID[%d] is invalid, check failed, req[%v]", secRequest.UserID, secRequest)
-		return
-	}
+	// Todo build user auth
+	// err = userValidate(secRequest)
+	// if err != nil {
+	// 	code = ErrUserValidationFailed
+	// 	logs.Warn("userID[%d] is invalid, check failed, req[%v]", secRequest.UserID, secRequest)
+	// 	return
+	// }
 
 	err = antiSpam(secRequest)
 	if err != nil {
@@ -72,6 +73,7 @@ func SecKill(secRequest *SecKillRequest) (data map[string]interface{}, code int,
 	}
 
 	userKey := fmt.Sprintf("%d_%d", secRequest.UserID, secRequest.ProductID)
+	secKillConf.UserConnMap[userKey] = secRequest.ResultChan
 	secKillConf.SecKillRequestChan <- secRequest
 	ticker := time.NewTicker(time.Second * 10)
 
