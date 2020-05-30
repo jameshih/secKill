@@ -31,5 +31,5 @@ func (p *ProductCountMgr) Add(productID, count int) {
 	} else {
 		cur += count
 	}
-	p.productCount[productID] = count
+	p.productCount[productID] = cur
 }
