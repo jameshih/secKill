@@ -28,8 +28,9 @@ type Event struct {
 	StartTimeStr string
 	EndTimeStr   string
 	StatusStr    string
-	Speed        int `db:"req_limit"`
-	BuyLimit     int `db:"buy_limit"`
+	Speed        int     `db:"req_limit"`
+	BuyLimit     int     `db:"buy_limit"`
+	BuyRate      float64 `db:"buy_rate"`
 }
 
 type ProductInfoConf struct {
@@ -134,8 +135,8 @@ func (p *EventModel) CreateEvent(event *Event) (err error) {
 		return
 	}
 
-	sql := "INSERT INTO event(name, product_id, start_time, end_time, total, status, req_limit, buy_limit)VALUES(?,?,?,?,?,?,?,?)"
-	_, err = Db.Exec(sql, event.EventName, event.ProductID, event.StartTime, event.EndTime, event.Total, event.Status, event.Speed, event.BuyLimit)
+	sql := "INSERT INTO event(name, product_id, start_time, end_time, total, status, req_limit, buy_limit, buy_rate)VALUES(?,?,?,?,?,?,?,?,?)"
+	_, err = Db.Exec(sql, event.EventName, event.ProductID, event.StartTime, event.EndTime, event.Total, event.Status, event.Speed, event.BuyLimit, event.BuyRate)
 	if err != nil {
 		logs.Warn("INSERT INTO event failed, error: %v, sql: %v", err, sql)
 		return
@@ -162,6 +163,7 @@ func (p *EventModel) SyncToEtcd(event *Event) (err error) {
 	productInfo.StartTime = event.StartTime
 	productInfo.Status = event.Status
 	productInfo.Total = event.Total
+	productInfo.BuyRate = event.BuyRate
 
 	productInfoList = append(productInfoList, productInfo)
 

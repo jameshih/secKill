@@ -215,8 +215,8 @@ func HandleSecKill(req *SecKillRequest) (res *SecKillResponse, err error) {
 	curRate := rand.Float64()
 	logs.Debug("curRate: %v, product: %v", curRate, product.BuyRate)
 	// Todo fix curRate
-	if curRate > 0.8 {
-		// if curRate > product.BuyRate {
+	// if curRate > 0.8 {
+	if curRate > product.BuyRate {
 		res.Code = ErrRetry
 		return
 	}

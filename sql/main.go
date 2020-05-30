@@ -38,7 +38,12 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+		_, err = dotx.Exec(db, "use-app-database")
+		if err != nil {
+			panic(err)
+		}
 	}
+
 	fmt.Println("using database[app]")
 
 	_, err = dotx.Exec(db, "create-product-table")

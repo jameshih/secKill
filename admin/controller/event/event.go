@@ -91,6 +91,13 @@ func (p *EventController) CreateEvent() {
 		return
 	}
 
+	buyRate, err := p.GetFloat("buy_rate")
+	if err != nil {
+		err = fmt.Errorf("invalid buy rate, error: %v", err)
+		logs.Warn(err)
+		return
+	}
+
 	eventModel := model.NewEventModel()
 	event := model.Event{
 		EventName: eventName,
@@ -100,6 +107,7 @@ func (p *EventController) CreateEvent() {
 		Total:     total,
 		Speed:     speed,
 		BuyLimit:  buyLimit,
+		BuyRate:   buyRate,
 	}
 
 	err = eventModel.CreateEvent(&event)
